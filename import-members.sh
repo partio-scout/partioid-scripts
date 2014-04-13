@@ -24,7 +24,7 @@ BACKUP_PATTERN='partioid_*.csv.bak*'
 curl --silent --user "${CSV_USER}:${CSV_PASSWORD}" "${CSV_DUMP_URL}" | tr ';' ',' > "${NEW_DUMP}"
 
 # Prepare changed lines for import
-[ ! -r "${PREV_DUMP}" ] && touch "${PREV_DUMP}"
+test ! -r "${PREV_DUMP}" && touch "${PREV_DUMP}"
 head -1 "${NEW_DUMP}" > "${TO_BE_IMPORTED}"
 comm --nocheck-order -13 "${PREV_DUMP}" "${NEW_DUMP}" >> "${TO_BE_IMPORTED}"
 if [[ -n "${SYNCOPE_IMPORT_FILE_PERMS-}" ]]; then
