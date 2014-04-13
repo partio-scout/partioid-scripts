@@ -1,0 +1,45 @@
+#! /bin/bash
+
+set -eu
+
+if [[ "${1-}" == "-y" ]]; then
+  DO_IMPORT=yes
+else
+  DO_IMPORT=no
+fi
+
+SCRIPT_DIR=$(dirname "$0")
+CONFFILE="${SCRIPT_DIR}"/import-members.conf
+cd "${SCRIPT_DIR}"
+
+NEW_DUMP=partioid.csv.new
+PREV_DUMP=partioid.csv.prev
+TO_BE_IMPORTED=partioid.csv
+BACKUP=partioid_$(date +%Y-%m-%d_%H:%M:%S).csv.bak
+BACKUP_PATTERN='partioid_*.csv.bak*'
+
+. "${CONFFILE}"
+
+# Get user dump from membership mgmt system
+curl --silent --user "${CSV_USER}:${CSV_PASSWORD}" "${CSV_DUMP_URL}" | tr ';' ',' > "${NEW_DUMP}"
+
+# Prepare changed lines for import
+[ ! -r "${PREV_DUMP}" ] && touch "${PREV_DUMP}"
+head -1 "${NEW_DUMP}" > "${TO_BE_IMPORTED}"
+comm --nocheck-order -13 "${PREV_DUMP}" "${NEW_DUMP}" >> "${TO_BE_IMPORTED}"
+if [[ -n "${SYNCOPE_IMPORT_FILE_PERMS-}" ]]; then
+  chown "${SYNCOPE_IMPORT_FILE_PERMS-}" "${TO_BE_IMPORTED}"
+fi
+
+# Backup and rotate out old dumps
+mv "${PREV_DUMP}" "${BACKUP}"
+test -s "${BACKUP}" && gzip "${BACKUP}"
+mv "${NEW_DUMP}" "${PREV_DUMP}"
+find . -maxdepth 1 -name "${BACKUP_PATTERN}" -mtime +30 -print0 |xargs -0 --no-run-if-empty rm
+
+# Import into Syncope
+if [[ "${DO_IMPORT}" == "yes" ]]; then
+  curl --user "${SYNCOPE_USER}:${SYNCOPE_PASSWORD}" --request POST "${SYNCOPE_IMPORT_TRIGGER_URL}" && echo
+else
+  echo "Not triggering Syncope import as "-y" switch was not given. CSV to be imported was saved in ${TO_BE_IMPORTED}"
+fi

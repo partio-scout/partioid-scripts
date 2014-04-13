@@ -1,0 +1,10 @@
+# CSV member dump
+CSV_USER=username
+CSV_PASSWORD=password
+CSV_DUMP_URL=https://url/to/csv
+
+# Syncope import conf
+SYNCOPE_USER=username
+SYNCOPE_PASSWORD=password
+SYNCOPE_IMPORT_FILE_PERMS=syncopeuid:syncopegid
+SYNCOPE_IMPORT_TRIGGER_URL=http://host:port/syncope/rest/task/execute/TASKID.json
