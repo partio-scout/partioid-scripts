@@ -39,7 +39,8 @@ find . -maxdepth 1 -name "${BACKUP_PATTERN}" -mtime +30 -print0 |xargs -0 --no-r
 
 # Import into Syncope
 if [[ "${DO_IMPORT}" == "yes" ]]; then
-  curl --user "${SYNCOPE_USER}:${SYNCOPE_PASSWORD}" --request POST "${SYNCOPE_IMPORT_TRIGGER_URL}" && echo
+  echo -n "Triggering Syncope import for $(tail -n +2 ${TO_BE_IMPORTED} | wc -l) new/updated users: "
+  curl --silent --user "${SYNCOPE_USER}:${SYNCOPE_PASSWORD}" --request POST "${SYNCOPE_IMPORT_TRIGGER_URL}" && echo
 else
   echo "Not triggering Syncope import as "-y" switch was not given. CSV to be imported was saved in ${TO_BE_IMPORTED}"
 fi
