@@ -9,7 +9,7 @@ else
 fi
 
 SCRIPT_DIR=$(dirname "$0")
-CONFFILE="${SCRIPT_DIR}"/import-members.conf
+CONFFILE="${SCRIPT_DIR}"/../etc/syncope-import-members.conf
 cd "${SCRIPT_DIR}"
 
 NEW_DUMP=partioid.csv.new
