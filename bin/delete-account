@@ -1,0 +1,49 @@
+#! /bin/bash
+
+set -eu -o pipefail
+
+if [[ -z "$1" ]]; then
+  echo "Usage: $0 <membernumber>" >&2
+  exit 1
+fi
+
+MYSQL=$(dirname "$0")/mysql
+MEMBERNUMBER="$(($1))"
+
+USERID=$("${MYSQL}" -N -B -e "\
+select u.id, u.firstname, u.lastname, u.email, ifnull(u.username,'-'), ifnull(l.external_resource,'-'), ifnull(l.external_id,'-')
+from users u left join linked_accounts l on u.id=l.userid
+where membernumber='${MEMBERNUMBER}'" \
+| {
+  IFS=$'\t' read -r USERID FIRSTNAME LASTNAME EMAIL PARTIOID_USERNAME EXT_RESOURCE EXT_ID
+  
+
+  if [[ -z "${USERID}" ]]; then
+    echo "User not found with membernumber=${MEMBERNUMBER}" >&2
+    exit 1
+  fi
+
+  echo "Found user (id=${USERID}): ${FIRSTNAME} ${LASTNAME}, ${EMAIL}" >&2
+  if [ "${PARTIOID_USERNAME}" == "-" -a "${EXT_ID}" == "-" ]; then
+    echo "This user does not have a registered PartioID account." >&2
+    exit 0
+  fi
+
+  if [[ "${PARTIOID_USERNAME}" != "-" ]]; then
+    echo "PartioID account username: ${PARTIOID_USERNAME}" >&2
+  fi
+  if [[ "${EXT_ID}" != "-" ]]; then
+    echo "External account: ${EXT_RESOURCE} ${EXT_ID}" >&2
+  fi
+
+  echo "${USERID}"
+})
+
+echo -n "Delete account(s) for member ${MEMBERNUMBER}? [y/n] "
+read -r YESNO
+if [[ "${YESNO}" == "y" ]]; then
+  "${MYSQL}" -e "update users set username=null, password=null where membernumber='${MEMBERNUMBER}'"
+  "${MYSQL}" -e "delete from linked_accounts where userid='${USERID}'"
+else
+  echo 'Not deleting.'
+fi
