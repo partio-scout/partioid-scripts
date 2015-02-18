@@ -1,3 +1,2 @@
-import-members.conf
-partioid*.csv*
-csvdir_db.*
+/etc
+/var
