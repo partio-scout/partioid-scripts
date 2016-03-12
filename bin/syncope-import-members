@@ -14,7 +14,6 @@ WORK_DIR="${SCRIPT_DIR}/../var/syncope-import-members"
 mkdir -p "${WORK_DIR}"
 
 CONFFILE="${CONF_DIR}/syncope-import-members.conf"
-cd "${WORK_DIR}"
 
 NEW_DUMP=partioid.csv.new
 PREV_DUMP=partioid.csv.prev
@@ -23,6 +22,8 @@ BACKUP=partioid_$(date +%Y-%m-%d_%H:%M:%S).csv.bak
 BACKUP_PATTERN='partioid_*.csv.bak*'
 
 . "${CONFFILE}"
+
+cd "${WORK_DIR}"
 
 # Get user dump from membership mgmt system
 curl --silent --user "${CSV_USER}:${CSV_PASSWORD}" "${CSV_DUMP_URL}" | tr ';' ',' > "${NEW_DUMP}"
