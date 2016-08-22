@@ -3,4 +3,5 @@
 # Log everything from stdout into syslog, but have any output into stderr be mailed to admin
 exec > >(/usr/bin/logger -t 'o365-export-members')
 
-/opt/partioid-scripts/bin/o365-export-members
+cd /opt/partioid-scripts/bin
+./o365-export-members
