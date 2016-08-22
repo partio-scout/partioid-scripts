@@ -1,0 +1,9 @@
+#! /bin/bash
+
+set -eu
+
+cd o365
+
+./export_new.sh -y
+./export_upd.sh -y
+./export_del.sh -y
