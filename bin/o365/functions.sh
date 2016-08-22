@@ -19,8 +19,8 @@ function get_prev_tstamp(){
 function send_ftps(){
     local filename=$1
     if [[ "${DO_FTP}" == "yes" ]]; then
-        echo -n "Triggering FTPS file transfer for $filename"
-        curl -T $filename  -u $(cat ../../etc/ftps-user) --ftp-ssl ftp://ftp.partio.eu/QA/
+        echo "Triggering FTPS file transfer for $filename"
+        curl -T $filename  -u $(cat ../../etc/ftps-user) --ftp-ssl $(cat ../../etc/ftps-url)
     else
         echo "Not triggering FTPS file transfer as "-y" switch was not given. CSV to be exported was saved in $WORK_DIR/$filename"
     fi
