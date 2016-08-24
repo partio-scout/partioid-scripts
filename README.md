@@ -15,3 +15,7 @@ Preconfigured MySQL command line client for accessing SimpleSAML database
 ## delete-account
 
 PartioID account delete helper
+
+## o365-export-members
+
+Member data export to Office365 system
