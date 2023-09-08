@@ -1,3 +1,6 @@
+Note: This project is no longer in production
+=============================================
+
 partioid-scripts
 ================
 
